@@ -15,13 +15,6 @@ def parse_args():
     return parser.parse_args()
 
 
-def foobar(asd):
-    print(asd.__class__)
-    if asd:
-        print(asd)
-    return True
-
-
 def main(args):
     s = requests.Session()
     r = s.get(args.url)
