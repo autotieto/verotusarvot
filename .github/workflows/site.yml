@@ -24,9 +24,13 @@ jobs:
 
     - name: Build
       run: |
+        echo "Deleting ./site and ./data"
         rm -rf ./site ./data
+        echo "Creating ./site and ./data"
         mkdir -p ./site ./data
+        echo "Downloading data..."
         python 01_download_data.py
+        echo "Processing data..."
         python 02_process_data.py
 
     - name: github pages deploy
