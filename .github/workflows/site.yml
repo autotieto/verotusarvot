@@ -24,7 +24,8 @@ jobs:
 
     - name: Build
       run: |
-        mkdir -p site
+        rm -rf ./site ./data
+        mkdir -p ./site ./data
         python 01_download_data.py
         python 02_process_data.py
 
