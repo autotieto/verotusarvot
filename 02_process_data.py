@@ -1,5 +1,6 @@
 #!env python
 
+import os
 import glob
 import re
 import csv
@@ -23,7 +24,7 @@ DTYPES = {
     'tax_eur': 'float32',
 }
 
-DEFAULT_STR, DEFAULT_INT, DEFAULT_FLOAT = 'XXX NONE XXX', -9999, -9999.0
+DEFAULT_STR, DEFAULT_INT, DEFAULT_FLOAT = '', 0, -0.0
 
 def conv(p, n, t, d):
     v = p(n).value
@@ -34,7 +35,7 @@ def conv(p, n, t, d):
 
 def main():
     table = []
-    for fn in glob.glob('data/*.xls'):
+    for fn in sorted(glob.glob('data/*.xls'), key=os.path.basename):
         print(fn)
         book = xlrd.open_workbook(fn)
         for sh in book.sheets():
@@ -49,7 +50,7 @@ def main():
                     conv(p, 0, str, DEFAULT_STR),
                     conv(p, 1, str, DEFAULT_STR),
                     conv(p, 2, str, DEFAULT_STR),
-                    conv(p, 3, str, ''),
+                    conv(p, 3, str, DEFAULT_STR),
                     conv(p, 4, int, DEFAULT_INT),
                     conv(p, 5, int, DEFAULT_INT),
                     conv(p, 6, int, DEFAULT_INT),

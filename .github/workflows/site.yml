@@ -33,6 +33,12 @@ jobs:
         echo "Processing data..."
         python 02_process_data.py
 
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: site
+        path: site
+
     - name: github pages deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
