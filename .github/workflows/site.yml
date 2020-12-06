@@ -23,6 +23,8 @@ jobs:
         pip install -r requirements.txt
 
     - name: Build
+      env:
+        OPENSSL_CONF: './openssl_min_tls12.conf'
       run: |
         echo "Deleting ./site and ./data"
         rm -rf ./site ./data

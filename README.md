@@ -20,6 +20,16 @@ driven_1000             float32
 value_eur               float32
 tax_eur                 float32
 dtype: object
+>>> df.describe()
+         driven_1000      value_eur        tax_eur
+count  261236.000000  261236.000000  261236.000000
+mean      124.889801   19692.144531    4955.073242
+std        99.164513   18304.714844    5862.279297
+min         0.000000       0.000000       0.000000
+25%        67.000000    8171.750000    1865.277527
+50%       121.000000   16500.099609    3699.395020
+75%       171.000000   25547.900391    6227.062378
+max      9500.000000  553952.000000  272152.437500
 >>> df
               make model              specification modifier decision_date   use_date  driven_1000     value_eur      tax_eur
 0       ALFA ROMEO   156               2.0 4D 114KW        N    2011-01-19 2000-04-26        200.0   2310.000000   651.419983
