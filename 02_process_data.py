@@ -64,6 +64,7 @@ def main():
         df[k] = df[k].astype(v)
 
     df.to_parquet('site/dump.parquet')
+    df.to_parquet('site/dump.parquet.gz', compression='gzip')
     df.to_csv('site/dump.csv.bz2', index=False, compression='bz2')
 
 if __name__=='__main__':
