@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
 
@@ -23,8 +23,6 @@ jobs:
         pip install -qq -r requirements.txt
 
     - name: Build
-      env:
-        OPENSSL_CONF: './openssl_min_tls12.conf'
       run: |
         echo "Deleting ./site and ./data"
         rm -rf ./site ./data
