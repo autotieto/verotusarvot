@@ -19,7 +19,7 @@ def main(args):
     s = requests.Session()
     r = s.get(args.url)
     page = soup(r.text, 'lxml')
-    year_links = page.select('h2:has(> a[id]):contains(Henkil) + ul > li:contains(xls) > a')
+    year_links = page.select('h2:has(> a[id]):-soup-contains(Henkil) + ul > li:-soup-contains(xls) > a')
     md5sums = []
     for a in year_links:
         year = RE_YEAR.findall(a.text)[0]
