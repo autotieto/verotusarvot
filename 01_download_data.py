@@ -7,11 +7,12 @@ import re
 from urllib.parse import urljoin
 import hashlib
 
+URL = 'https://www.vero.fi/henkiloasiakkaat/auto/autoverotus/autoveron_maara/taulukoita_ajoneuvojen_sovelletuista_ve/'
 RE_YEAR = re.compile('([0-9]{4})', re.M)
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Download data.')
-    parser.add_argument('--url', default='https://www.vero.fi/henkiloasiakkaat/auto/autoverotus/autoveron_maara/taulukoita_ajoneuvojen_sovelletuista_ve/')
+    parser.add_argument('--url', default=URL)
     return parser.parse_args()
 
 
