@@ -8,7 +8,7 @@ pip install --user --upgrade pandas pyarrow
 
 ```python
 import pandas as pd
-df = pd.read_parquet('https://autotieto.github.io/verotusarvot/dump.parquet')
+df = pd.read_parquet('https://autotieto.github.io/verotusarvot/verotusarvot.parquet')
 print(df.dtypes)
 print(df.describe())
 print(df)
