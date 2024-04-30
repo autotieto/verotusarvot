@@ -9,14 +9,15 @@ from functools import partial
 
 
 RE_YEAR = re.compile('([0-9]{4})', re.M)
-COLS = ['make', 'model', 'specification', 'modifier', 'decision_date', 'use_date', 'driven_1000', 'value_eur', 'tax_eur']
+COLS = ['make', 'model', 'specification', 'modifier', 
+        'decision_date', 'use_date', 'driven_1000', 'value_eur', 'tax_eur']
 DTYPES = {
     'make': 'category',
     'model': 'category',
     'specification': 'category',
     'modifier': 'category',
-    'decision_date': 'datetime64',
-    'use_date': 'datetime64',
+    'decision_date': 'datetime64[s]',
+    'use_date': 'datetime64[s]',
     'driven_1000': 'float32',
     'value_eur': 'float32',
     'tax_eur': 'float32',
