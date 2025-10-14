@@ -4,30 +4,28 @@ import os
 import glob
 import re
 import xlrd
-import pandas as pd
+import polars as pl
 from functools import partial
 
 
 RE_YEAR = re.compile('([0-9]{4})', re.M)
-COLS = ['make', 'model', 'specification', 'modifier', 
-        'decision_date', 'use_date', 'driven_1000', 'value_eur', 'tax_eur']
 DTYPES = {
-    'make': 'category',
-    'model': 'category',
-    'specification': 'category',
-    'modifier': 'category',
-    'decision_date': 'datetime64[s]',
-    'use_date': 'datetime64[s]',
-    'driven_1000': 'float32',
-    'value_eur': 'float32',
-    'tax_eur': 'float32',
+    'make': pl.datatypes.Categorical,
+    'model': pl.datatypes.Categorical,
+    'specification': pl.datatypes.Categorical,
+    'modifier': pl.datatypes.Categorical,
+    'decision_date': pl.datatypes.String,
+    'use_date': pl.datatypes.String,
+    'driven_1000': pl.datatypes.Float32,
+    'value_eur': pl.datatypes.Float32,
+    'tax_eur': pl.datatypes.Float32,
 }
 
 DEFAULT_STR, DEFAULT_INT, DEFAULT_FLOAT = '', 0, -0.0
 
 def conv(p, n, t, d):
     v = p(n).value
-    if v == None or v == '' or v == ' ':
+    if v is None or v == '' or v == ' ':
         return d
     else:
         return t(v)
@@ -35,7 +33,7 @@ def conv(p, n, t, d):
 
 def conv2(cell, t, d):
     v = cell.value
-    if v == None or v == '' or v == ' ':
+    if v is None or v == '' or v == ' ':
         return d
     else:
         return t(v)
@@ -83,7 +81,7 @@ def transfer_2021_feb_sheet(sh, table):
 
 def main():
     table = []
-    for fn in sorted(glob.glob('data/*.xls'), key=os.path.basename):
+    for fn in sorted(glob.glob('data/car_taxes*.xls'), key=os.path.basename):
         print(fn)
         book = xlrd.open_workbook(fn)
         for sh in book.sheets():
@@ -94,12 +92,15 @@ def main():
             else:
                 transfer_normal_sheet(sh, table)
 
-    df = pd.DataFrame(data=table, columns=COLS, dtype=str)
-    for k, v in DTYPES.items():
-        df[k] = df[k].astype(v)
+    df = pl.DataFrame(data=table, schema=DTYPES, orient='row')
+    df = df.with_columns(
+        pl.col("decision_date").str.to_date(format="%Y%m%d"),
+        pl.col("use_date").str.to_date(format="%Y%m%d"),
+    )
 
-    df.to_parquet('./site/verotusarvot.parquet', compression='brotli')
-    df.to_csv('./site/verotusarvot.csv.bz2', index=False, compression='bz2')
+    print(df)
+
+    df.write_parquet('./site/verotusarvot.parquet', compression='zstd')
 
 if __name__=='__main__':
     main()

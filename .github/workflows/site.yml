@@ -5,23 +5,19 @@ on: workflow_dispatch
 jobs:
 
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
 
     - name: git checkout
       uses: actions/checkout@v4
 
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+
     - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.12
-
-    - name: Install dependencies
-      run: |
-        python -m pip install -qq --upgrade pip
-        pip install -qq -r requirements.txt
-
+      run: uv python install
+      
     - name: Build
       run: |
         echo "Deleting ./site and ./data"
@@ -29,9 +25,9 @@ jobs:
         echo "Creating ./site and ./data"
         mkdir -p ./site ./data
         echo "Downloading data..."
-        python 01_download_data.py
+        uv run 01_download_data.py
         echo "Processing data..."
-        python 02_process_data.py
+        uv run 02_process_data.py
 
     - name: Archive production artifacts
       uses: actions/upload-artifact@v4

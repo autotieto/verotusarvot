@@ -1,13 +1,11 @@
-#!env python
-
-import requests
+import httpx
 import argparse
 from bs4 import BeautifulSoup as soup
 import re
 from urllib.parse import urljoin
 import hashlib
 
-URL = 'https://www.vero.fi/henkiloasiakkaat/auto/autoverotus/autoveron_maara/taulukoita_ajoneuvojen_sovelletuista_ve/'
+URL = 'https://www.vero.fi/henkiloasiakkaat/omaisuus/autovero/autoveron-maara/ajoneuvojen-sovellettuja-verotusarvoja/'
 RE_YEAR = re.compile('([0-9]{4})', re.M)
 
 def parse_args():
@@ -17,18 +15,18 @@ def parse_args():
 
 
 def main(args):
-    s = requests.Session()
+    s = httpx.Client(follow_redirects=True)
     r = s.get(args.url)
     page = soup(r.text, 'lxml')
-    year_links = page.select('h2:has(> a[id]):-soup-contains(Henkil) + p + p + ul > li:-soup-contains(xls) > a')
+    year_links = page.find_all('a', string=re.compile(r'vuosi \d{4} henkilöauto \(xls\)'))
     md5sums = []
     for a in year_links:
         year = RE_YEAR.findall(a.text)[0]
         filename = f'data/car_taxes_{year}.xls'
         url = urljoin(args.url, a['href'])
         digester = hashlib.md5()
-        with s.get(url, stream=True) as r, open(filename, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=10240):
+        with s.stream('GET', url) as r, open(filename, 'wb') as f:
+            for chunk in r.iter_bytes(chunk_size=10240):
                 f.write(chunk)
                 digester.update(chunk)
         md5 = digester.hexdigest()
