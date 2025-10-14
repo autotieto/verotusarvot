@@ -1,6 +1,0 @@
-requests>=2.24.0
-BeautifulSoup4>=4.9.3
-lxml
-pandas>=1.0.5
-xlrd
-pyarrow>=0.17.1
