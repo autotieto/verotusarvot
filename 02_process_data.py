@@ -1,5 +1,3 @@
-#!env python
-
 import os
 import glob
 import re
@@ -10,15 +8,15 @@ from functools import partial
 
 RE_YEAR = re.compile('([0-9]{4})', re.M)
 DTYPES = {
-    'make': pl.datatypes.Categorical,
-    'model': pl.datatypes.Categorical,
-    'specification': pl.datatypes.Categorical,
-    'modifier': pl.datatypes.Categorical,
-    'decision_date': pl.datatypes.String,
-    'use_date': pl.datatypes.String,
-    'driven_1000': pl.datatypes.Float32,
-    'value_eur': pl.datatypes.Float32,
-    'tax_eur': pl.datatypes.Float32,
+    'make': pl.Categorical,
+    'model': pl.Categorical,
+    'specification': pl.Categorical,
+    'modifier': pl.Categorical,
+    'decision_date': pl.String,
+    'use_date': pl.String,
+    'driven_1000': pl.Float32,
+    'value_eur': pl.Float32,
+    'tax_eur': pl.Float32,
 }
 
 DEFAULT_STR, DEFAULT_INT, DEFAULT_FLOAT = '', 0, -0.0
