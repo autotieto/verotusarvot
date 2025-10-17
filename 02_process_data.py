@@ -29,9 +29,8 @@ def convert(value, transformer, default):
 
 
 def transfer_normal_sheet(sheet: pyexcel.Sheet, table: list[list]):
-    n = 2 if sheet[1, 0] == 'Märke' else 1
-    for row in list(sheet)[n:]:
-        if set(row) == {""} or row[0]== '':
+    for row in list(sheet)[2:]:
+        if row[0] == '':
             continue
         item = [
             convert(row[0], str, DEFAULT_STR),
@@ -48,9 +47,8 @@ def transfer_normal_sheet(sheet: pyexcel.Sheet, table: list[list]):
 
 
 def transfer_2021_feb_sheet(sheet: pyexcel.Sheet, table: list[list]):
-    n = 2 if sheet[1, 0] == 'Märke' else 1
-    for row in list(sheet)[n:]:
-        if set(row) == {""} or row[0]== '':
+    for row in list(sheet)[1:]:
+        if row[0] == '':
             continue
         item = [
             convert(row[0], str, DEFAULT_STR),
@@ -72,9 +70,12 @@ def main():
         print(f'procesing {fn}')
         book = pyexcel.get_book(file_name = fn)
         for sheet in list(book)[1:]:
-            if len(sheet) == 0 or sheet[0, 1] != 'Malli':
+            print(sheet[0, 0], sheet[1, 0])
+            if sheet[0, 0] != 'Merkki':
                 continue
-            elif sheet[0, 2] == 'Cm3':
+            elif sheet[1, 0] == '':
+                continue
+            elif sheet[1, 0] != 'Märke':
                 transfer_2021_feb_sheet(sheet, table)
             else:
                 transfer_normal_sheet(sheet, table)
