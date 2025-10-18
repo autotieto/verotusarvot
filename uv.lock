@@ -345,7 +345,6 @@ dependencies = [
     { name = "polars" },
     { name = "pyexcel" },
     { name = "pyexcel-xls" },
-    { name = "xlrd" },
 ]
 
 [package.dev-dependencies]
@@ -363,7 +362,6 @@ requires-dist = [
     { name = "polars", specifier = ">=1.34.0" },
     { name = "pyexcel", specifier = ">=0.7.3" },
     { name = "pyexcel-xls", specifier = ">=0.7.1" },
-    { name = "xlrd", specifier = ">=2.0.2" },
 ]
 
 [package.metadata.requires-dev]

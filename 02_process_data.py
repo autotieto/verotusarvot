@@ -5,24 +5,24 @@ import pyexcel
 import polars as pl
 
 
-RE_YEAR = re.compile('([0-9]{4})', re.M)
+RE_YEAR = re.compile("([0-9]{4})", re.M)
 DTYPES = {
-    'make': pl.Categorical,
-    'model': pl.Categorical,
-    'specification': pl.Categorical,
-    'modifier': pl.Categorical,
-    'decision_date': pl.String,
-    'use_date': pl.String,
-    'driven_1000': pl.Float32,
-    'value_eur': pl.Float32,
-    'tax_eur': pl.Float32,
+    "make": pl.Categorical,
+    "model": pl.Categorical,
+    "specification": pl.Categorical,
+    "modifier": pl.Categorical,
+    "decision_date": pl.String,
+    "use_date": pl.String,
+    "driven_1000": pl.Float32,
+    "value_eur": pl.Float32,
+    "tax_eur": pl.Float32,
 }
 
-DEFAULT_STR, DEFAULT_INT, DEFAULT_FLOAT, DEFAULT_DATE = '', 0, -0.0, '9999-12-31'
+DEFAULT_STR, DEFAULT_INT, DEFAULT_FLOAT, DEFAULT_DATE = "", 0, -0.0, "9999-12-31"
 
 
 def convert(value, transformer, default):
-    if value is None or value == '' or value == ' ':
+    if value is None or value == "" or value == " ":
         return default
     else:
         return transformer(value)
@@ -30,7 +30,7 @@ def convert(value, transformer, default):
 
 def transfer_normal_sheet(sheet: pyexcel.Sheet, table: list[list]):
     for row in list(sheet)[2:]:
-        if row[0] == '':
+        if row[0] == "":
             continue
         item = [
             convert(row[0], str, DEFAULT_STR),
@@ -48,13 +48,13 @@ def transfer_normal_sheet(sheet: pyexcel.Sheet, table: list[list]):
 
 def transfer_2021_feb_sheet(sheet: pyexcel.Sheet, table: list[list]):
     for row in list(sheet)[1:]:
-        if row[0] == '':
+        if row[0] == "":
             continue
         item = [
             convert(row[0], str, DEFAULT_STR),
             convert(row[1], str, DEFAULT_STR),
-            '',
-            '',
+            "",
+            "",
             convert(row[10], str, DEFAULT_DATE),
             convert(row[11], str, DEFAULT_DATE),
             convert(row[12], int, DEFAULT_INT),
@@ -66,21 +66,21 @@ def transfer_2021_feb_sheet(sheet: pyexcel.Sheet, table: list[list]):
 
 def main():
     table = []
-    for fn in sorted(glob.glob('data/car_taxes*.xls'), key=os.path.basename):
-        print(f'procesing {fn}')
-        book = pyexcel.get_book(file_name = fn)
+    for fn in sorted(glob.glob("data/car_taxes*.xls"), key=os.path.basename):
+        print(f"procesing {fn}")
+        book = pyexcel.get_book(file_name=fn)
         for sheet in list(book)[1:]:
             print(sheet[0, 0], sheet[1, 0])
-            if sheet[0, 0] != 'Merkki':
+            if sheet[0, 0] != "Merkki":
                 continue
-            elif sheet[1, 0] == '':
+            elif sheet[1, 0] == "":
                 continue
-            elif sheet[1, 0] != 'Märke':
+            elif sheet[1, 0] != "Märke":
                 transfer_2021_feb_sheet(sheet, table)
             else:
                 transfer_normal_sheet(sheet, table)
 
-    df = pl.DataFrame(data=table, schema=DTYPES, orient='row')
+    df = pl.DataFrame(data=table, schema=DTYPES, orient="row")
     df = df.with_columns(
         pl.col("decision_date").str.to_date(format="%Y%m%d"),
         pl.col("use_date").str.to_date(format="%Y%m%d"),
@@ -88,7 +88,8 @@ def main():
 
     print(df)
 
-    df.write_parquet('./site/verotusarvot.parquet', compression_level=19)
+    df.write_parquet("./site/verotusarvot.parquet", compression_level=19)
 
-if __name__=='__main__':
+
+if __name__ == "__main__":
     main()
