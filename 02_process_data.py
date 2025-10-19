@@ -70,7 +70,6 @@ def main():
         print(f"procesing {fn}")
         book = pyexcel.get_book(file_name=fn)
         for sheet in list(book)[1:]:
-            print(sheet[0, 0], sheet[1, 0])
             if sheet[0, 0] != "Merkki":
                 continue
             elif sheet[1, 0] == "":
