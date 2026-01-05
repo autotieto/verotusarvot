@@ -29,10 +29,13 @@ def main(args):
         filename = f"data/car_taxes_{year}.xls"
         url = urljoin(args.url, a["href"])
         digester = hashlib.md5()
-        with s.stream("GET", url) as r, open(filename, "wb") as f:
-            for chunk in r.iter_bytes(chunk_size=10240):
-                f.write(chunk)
-                digester.update(chunk)
+        with s.stream("GET", url) as r:
+            if r.status_code != 200:
+                continue
+            with open(filename, "wb") as f:
+                for chunk in r.iter_bytes(chunk_size=10240):
+                    f.write(chunk)
+                    digester.update(chunk)
         md5 = digester.hexdigest()
         md5sums.append((md5, filename))
         print(f"""{year}, {filename}, {md5}, {url}""")
