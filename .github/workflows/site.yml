@@ -6,38 +6,44 @@ on:
     # once every quarter
     - cron: '0 12 5 1,4,7,10 *'
 
+permissions: {}
+
 jobs:
 
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
 
     steps:
 
-    - name: git checkout
-      uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+          fetch-depth: 1
 
-    - name: Install uv
-      uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v7
 
-    - name: Set up Python
-      run: uv python install
-      
-    - name: Build
-      run: |
-        echo "Deleting ./site and ./data"
-        rm -rf ./site ./data
-        echo "Creating ./site and ./data"
-        mkdir -p ./site ./data
-        echo "Downloading data..."
-        uv run 01_download_data.py
-        echo "Processing data..."
-        uv run 02_process_data.py
+      - name: Set up Python
+        run: uv python install
 
-    - name: Upload static files as artifact
-      id: deployment
-      uses: actions/upload-pages-artifact@v4
-      with:
-        path: site/
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+        
+      - name: Build
+        run: |
+          echo "Deleting ./site and ./data"
+          rm -rf ./site ./data
+          echo "Creating ./site and ./data"
+          mkdir -p ./site ./data
+          echo "Downloading data..."
+          uv run 01_download_data.py
+          echo "Processing data..."
+          uv run 02_process_data.py
+
+      - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
+        with:
+          path: site/
 
   deploy:
     runs-on: ubuntu-latest
@@ -48,7 +54,9 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    timeout-minutes: 2
+
     steps:
-      - name: Deploy to GitHub Pages
+
+      - uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
         id: deployment
-        uses: actions/deploy-pages@v5
