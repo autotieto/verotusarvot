@@ -18,6 +18,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "ruff>=0.14.0",
+    "ruff>=0.15.12",
     "types-beautifulsoup4>=4.12.0.20250516",
 ]
