@@ -13,7 +13,7 @@ dependencies = [
     "polars>=1.40.1",
     "pyexcel>=0.7.3",
     "pyexcel-xls>=0.7.1",
-    "python-calamine>=0.5.3",
+    "python-calamine>=0.8.2",
 ]
 
 [dependency-groups]
