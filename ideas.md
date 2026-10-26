@@ -2,26 +2,66 @@
 
 If you know about your sheets and headers beforehand...
 
+```python
+import polars as pl
+
+def rename_cols(orig: str) -> str:
+    cols = {
+        'Merkki': 'brand',
+        'Malli': 'model',
+        'Cm3': 'displace_cm3',
+        'Käyttövoima': 'fuel',
+        'OvienLkm': 'doors',
+        'Korimalli': 'chassis_type',
+        'Vetotapa': 'traction_type',
+        'Vaihteisto': 'shifter',
+        'Kw': 'power_kw',
+        'Yksilölliset ominaisuudet': 'unique_features',
+        'Mallin tarkennin': 'model_specifier',
+        'Kunto H=Huono N=Normaali Y=Hyvä': 'repair',
+        'Käyttöönottopvä': 'use_date',
+        'Ensirekisteröintipäivä': 'use_date',
+        'Päätöspäivä': 'decision_date',
+        'Ajokm/1000': 'driven_1000km',
+        'Verotusarvo': 'tax_value',
+        'Veroprosentti': 'tax_pct',
+        'Autovero': 'car_tax',
+    }
+    if orig in cols:
+        return cols[orig]
+    else:
+        return orig
+
+df = (
+    pl.concat(
+        pl.read_excel(
+            'data/car_taxes_2022.xls',
+            engine='calamine',
+            sheet_id=range(2, 14),
+            drop_empty_rows=True,
+            read_options={'skip_rows': 0},
+        )
+        .values()
+    )
+    .filter(pl.col("Merkki") != 'Märke')
+    .rename(rename_cols)
+    .cast({
+        'driven_1000km': pl.UInt16,
+        'displace_cm3': pl.UInt16,
+        'brand': pl.Categorical,
+        'model': pl.Categorical,
+        'fuel': pl.Categorical,
+        'chassis_type': pl.Categorical,
+        'traction_type': pl.Categorical,
+        'shifter': pl.Categorical,
+    })
+    .with_columns(
+        pl.col("decision_date").str.to_date(format="%Y%m%d"),
+        pl.col("use_date").str.to_date(format="%Y%m%d"),
+    )
+)
 ```
->>> dfs = pl.read_excel('data/car_taxes_2011.xls', engine='calamine', sheet_id=range(2, 14), drop_empty_rows=True, read_options={'skip_rows': 1})
->>> df = pl.concat(dfs.values())
->>> df
-shape: (26_856, 9)
-┌────────────┬───────────┬───────────────────────────┬─────────────────────────────────┬───┬─────────────────┬────────────┬─────────────┬──────────┐
-│ Merkki     ┆ Malli     ┆ Mallin tarkennin          ┆ Kunto H=Huono N=Normaali Y=Hyv… ┆ … ┆ Käyttöönottopvä ┆ Ajokm/1000 ┆ Verotusarvo ┆ Autovero │
-│ ---        ┆ ---       ┆ ---                       ┆ ---                             ┆   ┆ ---             ┆ ---        ┆ ---         ┆ ---      │
-│ str        ┆ str       ┆ str                       ┆ str                             ┆   ┆ str             ┆ i64        ┆ f64         ┆ f64      │
-╞════════════╪═══════════╪═══════════════════════════╪═════════════════════════════════╪═══╪═════════════════╪════════════╪═════════════╪══════════╡
-│ ALFA ROMEO ┆ 156       ┆ 2.0 4D 114KW              ┆ N                               ┆ … ┆ 20000426        ┆ 200        ┆ 2310.0      ┆ 651.42   │
-│ ALFA ROMEO ┆ 156       ┆ 2.0 5D STW AUT 122KW      ┆ N                               ┆ … ┆ 20021101        ┆ 181        ┆ 3545.4      ┆ 1088.43  │
-│ ALFA ROMEO ┆ 159       ┆ 1.9 D 4D 110KW            ┆ N                               ┆ … ┆ 20060824        ┆ 99         ┆ 13062.0     ┆ 3174.06  │
-│ ALFA ROMEO ┆ 159       ┆ 2.2 4D 136KW              ┆ N                               ┆ … ┆ 20070829        ┆ 122        ┆ 13315.0     ┆ 3741.51  │
-│ ALFA ROMEO ┆ 159       ┆ 2.4 D 4D 154KW            ┆ N                               ┆ … ┆ 20070813        ┆ 99         ┆ 16267.35    ┆ 4343.38  │
-│ …          ┆ …         ┆ …                         ┆ …                               ┆ … ┆ …               ┆ …          ┆ …           ┆ …        │
-│ VOLVO      ┆ XC90      ┆ 2.4 D 5D MA 4WD AUT 136KW ┆ N                               ┆ … ┆ 20061006        ┆ 143        ┆ 26817.1     ┆ 9117.81  │
-│ VOLVO      ┆ XC90      ┆ 2.4 D 5D MA 4WD AUT 136KW ┆ N                               ┆ … ┆ 20061227        ┆ 100        ┆ 29076.2     ┆ 9885.9   │
-│ VOLVO      ┆ XC90      ┆ 2.4 D 5D MA 4WD AUT 136KW ┆ N                               ┆ … ┆ 20071108        ┆ 72         ┆ 32781.2     ┆ 11145.6  │
-│ VOLVO      ┆ XC90      ┆ 2.4 D 5D MA 4WD AUT 136KW ┆ N                               ┆ … ┆ 20080919        ┆ 75         ┆ 35324.35    ┆ 11374.44 │
-│ WARTBURG   ┆ 1.3  L353 ┆ 1.3 4D 43KW               ┆ N                               ┆ … ┆ 19891102        ┆ 70         ┆ 585.0       ┆ 129.28   │
-└────────────┴───────────┴───────────────────────────┴─────────────────────────────────┴───┴─────────────────┴────────────┴─────────────┴──────────┘
+
+```text
+
 ```
